@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather app</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            min-height: 100vh;
+            width: 100%;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #container{
+            width: 370px;
+            background: linear-gradient(120deg, rgb(7, 116, 240), rgb(255, 0, 255));
+            border-radius: 20px;
+        }
+        #top{
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #top input{
+            border: none;
+            outline: none;
+            width: 70%;
+            border-radius: 20px;
+            font-size: 20px;
+            padding: 10px 15px;
+            font-weight: 700;
+        }
+        #top div{
+            height: 40px;
+            width: 40px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #search-img{
+            height: 20px;
+            padding: 10px;
+        }
+        #weather{
+            display: none;
+        }
+        #middle{
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            gap: 5px;
+        }
+        sup{
+            font-size: 20px;
+        }
+        #middle img{
+            height: 170px;
+        }
+        #temperature{
+            font-size: 40px;
+        }
+        #city-name{
+            font-size: 45px;
+            font-weight: 400;
+        }
+        #bottom{
+            width: 85%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 30px;
+        }
+        #left-part, #right-part{
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        #wind-speed, #humidity{
+            font-size: 30px;
+        }
+        #left-part img{
+            height: 25px;
+            margin-right: 10px;
+        }
+        #right-part img{
+            height: 30px;
+            margin-right: 10px;
+        }
+        #error{
+            color: greenyellow;
+            margin: 0px 30px 30px 30px;
+            font-size: 18px;
+            display: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="top">
+            <input type="text" id="input" spellcheck="false" placeholder="Enter city name">
+            <div id="search-btn">
+                <img src="/images/search.png" alt="search image" id="search-img">
+            </div>
+        </div>
+        <div id="error">
+            <p>Invalid city name</p>
+        </div>
+        <div id="weather">
+            <div id="middle">
+                <div id="weather-img">
+                    <img src="" alt="">
+                </div>
+                <div id="temperature">
+                    <p></p>
+                </div>
+                <div id="city-name">
+                    <p></p>
+                </div>
+            </div>
+            <div id="bottom">
+                <div id="left-part">
+                    <img src="/images/humidity.png" alt="">
+                    <div>
+                        <p id="humidity"></p>
+                        <p></p>   
+                    </div>
+                </div>
+                <div id="right-part">
+                    <img src="/images/wind.png" alt="">
+                    <div>
+                        <p id="wind-speed"></p>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const key = "0c121a39332b5026abd43be355fb91ae"
+        const url = "https://api.openweathermap.org/data/2.5/weather?units=metric&q="
+        
+        const searchBtn = document.getElementById("search-btn")
+        const input = document.querySelector("input")
+        const weatherImg = document.querySelector("#weather-img img")
+        const temp = document.getElementById("temperature")
+        const cityName = document.getElementById("city-name")
+        const humidity = document.getElementById("humidity")
+        const windSpeed = document.getElementById("wind-speed")
+
+        async function checkWeather(city){
+            const responce = await fetch(url + city + `&appid=${key}`)
+
+            if(responce.status == 404){
+                document.getElementById("error").style.display = "block"
+                document.getElementById("weather").style.display = "none"
+            }else{
+                 document.getElementById("weather").style.display = "block"
+                 document.getElementById("error").style.display = "none"
+                let data = await responce.json()
+    
+                temp.innerText = Math.round(data.main.temp) + "°C"
+                cityName.innerText = data.name
+                humidity.innerText = data.main.humidity + "%"
+                windSpeed.innerText = data.wind.speed + "km/h"
+    
+                if(data.weather[0].main == "Clouds"){
+                    weatherImg.src = "images/clouds.png"
+                }else if(data.weather[0].main == "Clear"){
+                    weatherImg.src = "images/clear.png"
+                }else if(data.weather[0].main == "Drizzle"){
+                    weatherImg.src = "images/drizzle.png"
+                }else if(data.weather[0].main == "MIst"){
+                    weatherImg.src = "images/mist.png"
+                }else if(data.weather[0].main == "Rain"){
+                    weatherImg.src = "images/rain.png"
+                }else{
+                    weatherImg.src = "images/snow.png"
+                }
+            }
+        }
+        searchBtn.addEventListener("click",(evt)=>{
+            checkWeather(input.value)
+        })
+
+    </script>
+</body>
+</html>
